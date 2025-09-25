@@ -1,24 +1,27 @@
 use std::fmt::{self, Display};
 
 use colored::Colorize;
-use serde::{Deserialize, Serialize};
 use serde::de::{self, Deserializer};
+use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-
-#[derive(Debug, Default, Deserialize, Serialize)]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct Card {
     pub id: u32,
     pub name: String,
+    #[serde(skip_serializing)]
     #[serde(rename = "humanReadableCardType")]
     pub card_type: String,
+    #[serde(skip_serializing)]
     pub level: Option<u8>,
+    #[serde(skip_serializing)]
     pub archetype: Option<String>,
+    #[serde(skip_serializing)]
+    pub ygoprodeck_url: Option<String>,
     #[serde(rename = "misc_info", deserialize_with = "extract_genesys_points")]
     pub genesys_points: u8,
     #[serde(skip_deserializing, skip_serializing)]
     pub change: i16,
-
 }
 
 impl Display for Card {
@@ -48,14 +51,25 @@ where
     let value: Value = Deserialize::deserialize(deserializer)?;
 
     match value {
-        Value::Number(n) => n.as_u64()
+        Value::Number(n) => n
+            .as_u64()
             .map(|v| v as u8)
             .ok_or_else(|| de::Error::custom("Invalid number for genesys_points")),
-        Value::Array(arr) => arr.first()
+        Value::Array(arr) => arr
+            .first()
             .and_then(|v| v.get("genesys_points"))
             .and_then(|gp| gp.as_u64())
             .map(|gp| gp as u8)
             .ok_or_else(|| de::Error::custom("Missing genesys_points in misc_info[0]")),
         _ => Err(de::Error::custom("Unexpected format for misc_info")),
     }
+}
+
+// Minal card data for calculating change in points
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+pub(crate) struct MinimalCard {
+    pub id: u32,
+    pub name: String,
+    #[serde(rename = "misc_info", deserialize_with = "extract_genesys_points")]
+    pub genesys_points: u8,
 }

@@ -4,7 +4,8 @@ use std::{
     collections::HashMap,
     env,
     fs::{self, File, OpenOptions},
-    io::{self, Write},
+    hash::Hash,
+    io::Write,
     path::PathBuf,
     str::FromStr,
 };
@@ -15,13 +16,13 @@ use crate::{cards, error};
 pub struct Data {
     data: Vec<cards::Card>,
 }
-// Calculate value changes
+// --- Data manip ---
 pub(crate) fn calculate_delta(
     new_cards: Vec<cards::Card>,
-    old_cards: Vec<cards::Card>,
+    old_cards: Vec<cards::MinimalCard>,
 ) -> Vec<cards::Card> {
     let delta = |old: u8, new: u8| -> i16 { new as i16 - old as i16 };
-    let old_map: HashMap<u32, cards::Card> = old_cards.into_iter().map(|c| (c.id, c)).collect();
+    let old_map: HashMap<u32, cards::MinimalCard> = old_cards.into_iter().map(|c| (c.id, c)).collect();
     let new_map: HashMap<u32, cards::Card> = new_cards.into_iter().map(|c| (c.id, c)).collect();
 
     let cards_with_delta: Vec<cards::Card> = new_map
@@ -30,7 +31,7 @@ pub(crate) fn calculate_delta(
             let old = old_map
                 .get(&id)
                 .map(|old| old.genesys_points)
-                .unwrap_or_default();
+                .unwrap_or(card.genesys_points);
 
             card.change = delta(old, card.genesys_points);
 
@@ -42,8 +43,16 @@ pub(crate) fn calculate_delta(
     cards_with_delta
 }
 
+pub(crate) fn lens<F, R>(cards: &[cards::Card], accessor: F) -> Vec<R>
+where
+    F: Fn(&cards::Card) -> R,
+    R: Clone + Hash + Eq + Ord,
+{
+    cards.iter().map(accessor).unique().sorted().collect::<Vec<R>>()
+}
+
 // --- YGO Pro API ---
-pub async fn get_banlist() -> Result<Vec<cards::Card>, error::Error> {
+pub(crate) async fn get_banlist() -> Result<Vec<cards::Card>, error::Error> {
     let body =
         reqwest::get("https://db.ygoprodeck.com/api/v7/cardinfo.php?format=genesys&misc=yes")
             .await?
@@ -61,7 +70,6 @@ pub async fn get_banlist() -> Result<Vec<cards::Card>, error::Error> {
         .filter(|c| c.genesys_points > 0)
         .collect();
 
-
     Ok(cards)
 }
 
@@ -73,11 +81,11 @@ fn get_path() -> PathBuf {
     path
 }
 
-pub fn load_previous_banlist() -> Result<Vec<cards::Card>, error::Error> {
+pub(crate) fn load_previous_banlist() -> Result<Vec<cards::MinimalCard>, error::Error> {
     let path: PathBuf = get_path();
 
     if !path.exists() {
-        return Err(error::Error::MissingFile(path));
+        return Ok(Vec::new());
     }
 
     let json = fs::read_to_string(&path).map_err(|e| error::Error::FileRead {
@@ -93,7 +101,7 @@ pub fn load_previous_banlist() -> Result<Vec<cards::Card>, error::Error> {
     Ok(cards)
 }
 
-pub fn save_banlist(cards: Vec<cards::Card>) -> std::io::Result<()> {
+pub(crate) fn save_banlist(cards: Vec<cards::Card>) -> std::io::Result<()> {
     let path = get_path();
 
     let json = serde_json::to_string_pretty(&cards).map_err(|_| {
@@ -114,6 +122,20 @@ pub fn save_banlist(cards: Vec<cards::Card>) -> std::io::Result<()> {
         .open(&path)?;
 
     file.write_all(json.as_bytes())?;
+
+    Ok(())
+}
+
+// --- Open cards in web browser ---
+pub(crate) fn open_card_db(cards: Vec<cards::Card>) -> std::io::Result<()> {
+    cards
+        .into_iter()
+        .filter(|c| c.ygoprodeck_url.is_some())
+        .for_each(|c| {
+            if webbrowser::open(&c.ygoprodeck_url.unwrap()).is_ok() {
+                println!("Opened: {}", c.name);
+            }
+        });
 
     Ok(())
 }
