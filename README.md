@@ -20,7 +20,7 @@ Search cards by:
 
 You can install `genesys` using cargo:
 ```bash
-cargo install genesys
+cargo install genesys-ygo-cli
 ```
 This will install the latest version of `genesys` from [crates.io](https://crates.io/crates/genesys-ygo-cli).
 
