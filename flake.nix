@@ -31,6 +31,7 @@
                     extensions = [ "rust-src" ];
                 })
                 pkgs-stable.cargo
+                pkgs-stable.cargo-cross
                 pkgs-stable.rustup
                 pkgs-stable.rust-analyzer
                 pkgs-stable.openssl
