@@ -22,19 +22,16 @@ Search cards by:
 <details>
   <summary>From crates.io</summary>
     You can install `genesys` using cargo
-    ```bash
-    cargo install genesys
-    ```
+```bash
+cargo install genesys
+```
 </details>
 <details>
   <summary>From source</summary>
     You can build `genesys` using cargo
-    ```bash
-    git clone https://github.com/ll-nick/leadr.git
-    cd leadr
-    cargo install --path .
-    ```
+```bash
+git clone https://github.com/ShilohAlleyne/genesys.rs
+cd leadr
+cargo install --path .
+```
 </details>
-
-
-
