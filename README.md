@@ -16,22 +16,33 @@ Search cards by:
 > Note: This CLI is simple, if its missing functionality either raise and issue or fork and add it yourself lol
 
 <details>
-  <summary>From pre-built binaries</summary>
-    You can download pre-built binaries from the releases page. Just copy the binary to a directory in your PATH and make it executable.
+<summary>From pre-built binaries</summary>
+
+You can download pre-built binaries from the [releases page](https://github.com/ShilohAlleyne/genesys.rs/releases).
+Just copy the binary to a directory in your `PATH` and make it executable.
+
 </details>
+
 <details>
-  <summary>From crates.io</summary>
-    You can install `genesys` using cargo
+<summary>From crates.io</summary>
+
+You can install `genesys` using cargo:
 ```bash
 cargo install genesys
 ```
+This will install the latest version of `genesys` from [crates.io](https://crates.io/crates/genesys).
+
 </details>
+
 <details>
-  <summary>From source</summary>
-    You can build `genesys` using cargo
+<summary>From source</summary>
+
+You can build `genesys` from source using cargo:
+
 ```bash
 git clone https://github.com/ShilohAlleyne/genesys.rs
-cd leadr
+cd genesys
 cargo install --path .
 ```
+
 </details>
