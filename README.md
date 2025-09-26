@@ -1,6 +1,6 @@
 # Genesys.rs
 
-Genesys.rs CLI is an simple cli for searching cards (and opening their YGO-Pro db entry) in the Genesys Yugioh format. Cards point values are automatically updated and changes in values between band lists are tracked. 
+Genesys.rs is an simple cli for searching cards (and opening their YGO-Pro db entry) in the Genesys Yugioh format. Cards point values are automatically updated and changes in values between banlists are tracked. 
 
 # Features
 
@@ -30,7 +30,7 @@ You can install `genesys` using cargo:
 ```bash
 cargo install genesys
 ```
-This will install the latest version of `genesys` from [crates.io](https://crates.io/crates/genesys).
+This will install the latest version of `genesys` from [crates.io](https://crates.io/crates/genesys-ygo-cli).
 
 </details>
 

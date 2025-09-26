@@ -340,7 +340,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "genesys"
+name = "genesys-ygo-cli"
 version = "0.1.0"
 dependencies = [
  "colored",

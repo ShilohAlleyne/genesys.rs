@@ -2,5 +2,5 @@ use inquire::error::InquireResult;
 
 #[tokio::main]
 async fn main() -> InquireResult<()> {
-    genesys::go().await
+    genesys_ygo_cli::go().await
 }
